@@ -5,7 +5,15 @@ import { NextResponse } from 'next/server';
 import prisma from '../../../lib/db';
 
 export async function GET() {
-    const goals = await prisma.goal.findMany();
+    const goals = await prisma.goal.findMany({
+        include: {
+            tasks: {
+                select: {
+                    status: true
+                }
+            }
+        }
+    });
 
     return NextResponse.json({ 'goals': goals }, { status: 200 });
 }
@@ -14,7 +22,9 @@ export async function POST(request: Request) {
     const data = await request.json();
 
     const goal = await prisma.goal.create({
-        data: data,
+        data: {
+            ...data
+        },
     });
 
     return NextResponse.json(
