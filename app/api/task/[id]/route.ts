@@ -6,6 +6,19 @@ export async function PATCH(request: Request, { params }: any) {
     const id = params.id;
     const content = await request.json();
 
+    const availableStatus = ['todo', 'done'];
+
+    if (availableStatus.includes(content.status) === false) {
+        return NextResponse.json(
+            {
+                message: 'Invalid status',
+            },
+            {
+                status: 400
+            }
+        );
+    }
+
     const task = await prisma.task.update({
         where: { id: id },
         data: {
@@ -36,7 +49,7 @@ export async function DELETE(request: Request, { params }: any) {
             throw e;
         }
         console.warn("Not found when deleting task");
-     });
+    });
 
     return NextResponse.json({}, { status: 200 });
 }
