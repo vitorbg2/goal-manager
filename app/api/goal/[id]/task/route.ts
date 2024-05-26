@@ -7,6 +7,7 @@ import prisma from '../../../../../lib/db';
 export async function POST(request: Request, { params }: any) {
     const id = params.id;
     const data = await request.json();
+    data.status = 'todo';
 
     const task = await prisma.task.create({
         data: {

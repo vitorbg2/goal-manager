@@ -1,8 +1,7 @@
 //import next request and response
 import { NextResponse } from 'next/server';
-
-//import prisma client
 import prisma from '../../../lib/db';
+import GoalDTO from '../dto/goal';
 
 export async function GET() {
     const goals = await prisma.goal.findMany({
@@ -14,8 +13,9 @@ export async function GET() {
             }
         }
     });
+    const response = goals.map((goal) => GoalDTO.fromJSON(goal));
 
-    return NextResponse.json({ 'goals': goals }, { status: 200 });
+    return NextResponse.json({ 'goals': response }, { status: 200 });
 }
 
 export async function POST(request: Request) {
