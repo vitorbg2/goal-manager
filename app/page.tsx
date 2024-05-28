@@ -72,7 +72,7 @@ export default function HomePage () {
           <div className='basis-2/5 flex flex-col'>
             <div className='h-44 w-2/3 flex items-center ml-8'>
               <div className='basis-2/5'>
-                <div className='flex w-28 h-20 bg-yellow-300 hover:bg-yellow-500 active:bg-yellow-600 shadow-md hover:shadow-xl rounded-xl justify-center items-center text-4xl cursor-pointer' onClick={() => router.push('/goal')}>
+                <div className='flex w-28 h-20 bg-yellow-300 hover:bg-yellow-500 active:bg-yellow-600 shadow-md hover:shadow-xl rounded-xl justify-center items-center text-4xl cursor-pointer' onClick={() => router.push('/goal/add')}>
                   +
                 </div>
               </div>
