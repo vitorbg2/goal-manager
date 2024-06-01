@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../../lib/db';
+import prisma from '../../../../lib/db/db';
 import { Prisma as PrismaRef } from '@prisma/client'
 
 export async function GET(request: Request, { params }: any) {

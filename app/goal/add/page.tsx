@@ -5,50 +5,36 @@ import { useRouter } from 'next/navigation'
 export default function GoalPage() {
     const router = useRouter()
     const [isLoading, setLoading] = useState(false)
-    const [form, setForm] = useState<FormData>()
     const [error, setError] = useState<string>()
 
     const isValid = (formData: FormData): boolean => {
         if (!formData.get("title") || !formData.get("description") || !formData.get("dueDate")) {
             return false;
         }
-
         return true;
     }
 
-    async function onSubmit(formData: FormData) {
-        if (!isValid(formData)) {
+    async function onSubmit(formData: FormData) {     
+        if (!formData || !isValid(formData)) {
             setError("Formulário inválido, preencha todos os campos");
-        }
-        setForm(formData)
-    }
-
-    useEffect(() => {
-        if (!form) {
             return;
         }
         setLoading(true);
         fetch('/api/goal', {
             method: 'POST',
             body: JSON.stringify({
-                'title': form.get("title"),
-                'description': form.get("description"),
-                'dueDate': new Date(form.get("dueDate")!.toString()).toISOString()
+                'title': formData.get("title"),
+                'description': formData.get("description"),
+                'dueDate': new Date(formData.get("dueDate")!.toString()).toISOString()
             })
         }).then((data) => {
             console.log(data);
             router.push('/');
+        }).catch((err) => {
+            console.error(err);
         }).finally(() => {
             setLoading(false);
-        })
-    }, [form]);
-
-    if (isLoading) {
-        return (
-            <div>
-                Carregando....
-            </div>
-        );
+        });
     }
 
     return (
@@ -75,8 +61,14 @@ export default function GoalPage() {
                         <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="dueDate" name="dueDate" type="date" placeholder="Due Date" />
                     </div>
                     <div className="flex w-full justify-end">
-                        <button className="justify-self-center bg-blue-500 w-64 h-12 hover:bg-blue-700 text-white font-bold rounded focus:outline-none focus:shadow-outline" type="submit">Criar</button>
+                        <button disabled={isLoading} className="justify-self-center bg-blue-500 w-64 h-12 hover:bg-blue-700 text-white font-bold rounded focus:outline-none focus:shadow-outline" type="submit">Criar</button>                        
                     </div>
+                    {error ? <div className="flex w-full justify-end">
+                    Falha ao tentar salvar o formulário, preencha os campos corretamente
+                    </div> : ''}
+                    {isLoading ? <div className="flex w-full justify-end">
+                    Carregando...
+                    </div> : ''}
                 </form>
             </div>
         </div>

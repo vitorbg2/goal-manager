@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 
 //import prisma client
-import prisma from '../../../../../lib/db';
+import prisma from '../../../../../lib/db/db';
 
 export async function POST(request: Request, { params }: any) {
     const id = params.id;
