@@ -3,18 +3,25 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function HomePage () {
+export default function HomePage() {
   const router = useRouter()
   const [data, setData] = useState<any>(null)
   const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/goal')
+    const abortController = new AbortController();
+    fetch('/api/goal', {signal: abortController.signal})
       .then(res => res.json())
       .then(data => {
         setData(data)
         setLoading(false)
-      })
+      }).catch((error) => {
+        if (error.name === 'AbortError') console.error("Abort request");
+      });
+
+    return () => {
+      abortController.abort();
+    };
   }, [])
 
   if (isLoading) return <p>Loading...</p>
