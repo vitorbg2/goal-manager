@@ -40,7 +40,7 @@ export default function HomePage() {
 
   const homePageGoalProgress = (goal: any) => {
     return (
-      <div className='bg-red-300 border-gray-700 border-2 flex flex-col w-80 h-40 rounded-3xl px-4 py-2 place-self-center mt-4'>
+      <div key={goal.id} className='bg-red-300 border-gray-700 border-2 flex flex-col w-80 h-40 rounded-3xl px-4 py-2 place-self-center mt-4'>
         <span className='text-center font-mono font-bold text-md pt-2'>
           {goal.title}
         </span>
