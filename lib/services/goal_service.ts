@@ -24,3 +24,37 @@ export async function CreateGoal(goalContract: GoalRequestContract): Promise<any
 
     return goal;
 }
+
+export async function UpdateGoal(goalContract: GoalRequestContract): Promise<any> {
+    if (!goalContract.id) {
+        throw Error('Need a ID To update a goal');
+    }
+    
+    const goal = await prisma.goal.update({
+        where: { id: goalContract.id },
+        data: {
+            title: goalContract.title,
+            description: goalContract.description,
+            dueDate: goalContract.dueDate,
+        }
+    });
+
+    await prisma.task.deleteMany({
+        where: {
+            goalId: goalContract.id
+        }
+    });
+
+    if (goalContract.tasks.length > 0) {
+        await prisma.task.createMany({
+            data: goalContract.tasks.map((task: TaskRequestContract) => ({
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                goalId: goal.id
+            }))
+        });
+    }
+
+    return goal;
+}

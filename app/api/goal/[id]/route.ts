@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../../../lib/db/db';
 import { Prisma as PrismaRef } from '@prisma/client'
+import { UpdateGoal } from '@/lib/services/goal_service';
+import GoalRequestContract from '../../dto/goal_request_contract';
 
 export async function GET(request: Request, { params }: any) {
     const id = params.id;
@@ -21,27 +23,30 @@ export async function GET(request: Request, { params }: any) {
     return NextResponse.json(goal);
 }
 
-export async function PATCH(request: Request, { params }: any) {
-    const id = params.id;
+export async function PUT(request: Request, { params }: any) {
+    try {
+        const id = params.id;
+        const json = await request.json();
+        const contract = GoalRequestContract.fromJSON({
+            ...json,
+            id: id
+        });
 
-    const content = await request.json();
+        const updatedGoal = await UpdateGoal(contract);
 
-    const goal = await prisma.goal.update({
-        where: { id: id },
-        data: {
-            ...content,
-        }
-    });
-
-    return NextResponse.json(
-        {
-            message: 'Goal updated',
-            goal: goal
-        },
-        {
-            status: 200
-        }
-    );
+        return NextResponse.json(
+            {
+                message: 'Goal updated',
+                goal: updatedGoal
+            },
+            {
+                status: 200
+            }
+        );
+    } catch (err) {
+        console.error(err);
+        return NextResponse.json({ message: 'Falha no servidor' }, { status: 500 });
+    }
 }
 
 export async function DELETE(request: Request, { params }: any) {
@@ -59,7 +64,7 @@ export async function DELETE(request: Request, { params }: any) {
             throw e;
         }
         console.warn("Not found when deleting goal");
-     });
+    });
 
     return NextResponse.json({}, { status: 200 });
 }

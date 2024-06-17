@@ -56,7 +56,15 @@ export default function GoalPage() {
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
             if (params.id) {
-                // Not implemented yet
+                await fetch(`/api/goal/${params.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        'title': data.title,
+                        'description': data.description,
+                        'dueDate': new Date(data.dueDate).toISOString(),
+                        'tasks': data.tasks
+                    })
+                });
             } else {
                 await fetch('/api/goal', {
                     method: 'POST',
@@ -171,7 +179,7 @@ export default function GoalPage() {
                     </div>
                     <div className="flex w-full justify-end">
                         <button disabled={isSubmitting} className="justify-self-center bg-blue-500 w-64 h-12 hover:bg-blue-700 text-white font-bold rounded focus:outline-none focus:shadow-outline" type="submit">
-                            {isSubmitting ? 'Carregando..' : 'Criar'}
+                            {isSubmitting ? 'Carregando..' : params.id ? 'Editar' : 'Criar'}
                         </button>
                     </div>
                     {

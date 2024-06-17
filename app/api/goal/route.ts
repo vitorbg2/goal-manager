@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import prisma from '../../../lib/db/db';
 import GoalDTO from '../dto/goal';
 import { CreateGoal } from '@/lib/services/goal_service';
-import GoalRequestContract from '../dto/goal_request_contract';
+import GoalRequestContract from '@/app/api/dto/goal_request_contract';
 
 export async function GET() {
     const goals = await prisma.goal.findMany({
