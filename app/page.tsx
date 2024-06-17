@@ -3,18 +3,26 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function HomePage () {
+export default function HomePage() {
   const router = useRouter()
   const [data, setData] = useState<any>(null)
   const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/goal')
+    // setup function
+    const abortController = new AbortController();
+    fetch('/api/goal', {signal: abortController.signal})
       .then(res => res.json())
       .then(data => {
         setData(data)
         setLoading(false)
-      })
+      }).catch((error) => {
+        if (error.name === 'AbortError') console.error("Abort request");
+      });
+
+    return () => { // the cleanup function will cancel fetch request. That's let cleanup function stop anything setup function is doing
+      abortController.abort();
+    };
   }, [])
 
   if (isLoading) return <p>Loading...</p>
@@ -33,8 +41,8 @@ export default function HomePage () {
 
   const homePageGoalProgress = (goal: any) => {
     return (
-      <div className='bg-red-300 border-gray-700 border-2 flex flex-col w-80 h-40 rounded-3xl px-4 py-2 place-self-center mt-4'>
-        <span className='text-center font-mono font-bold text-md'>
+      <div key={goal.id} onClick={() => router.push(`/goal/add/${goal.id}`)} className='bg-red-300 hover:bg-red-400 cursor-pointer hover:shadow-2xl border-gray-700 border flex flex-col w-80 h-40 rounded-3xl px-4 py-2 place-self-center mt-4'>
+        <span className='text-center font-mono font-bold text-md pt-2'>
           {goal.title}
         </span>
         <span className='text-center font-mono mt-2'>
@@ -70,9 +78,9 @@ export default function HomePage () {
         </div>
         <div id='goals_home' className='flex flex-1 h-max'>
           <div className='basis-2/5 flex flex-col'>
-            <div className='h-64 w-2/3 flex items-center ml-8'>
+            <div className='h-44 w-2/3 flex items-center ml-8'>
               <div className='basis-2/5'>
-                <div className='flex w-28 h-20 bg-yellow-300 hover:bg-yellow-500 active:bg-yellow-600 shadow-md hover:shadow-xl rounded-xl justify-center items-center text-4xl cursor-pointer' onClick={() => router.push('/goal')}>
+                <div className='flex w-28 h-20 bg-yellow-300 hover:bg-yellow-500 active:bg-yellow-600 shadow-md hover:shadow-xl rounded-xl justify-center items-center text-4xl cursor-pointer' onClick={() => router.push('/goal/add')}>
                   +
                 </div>
               </div>
@@ -81,7 +89,7 @@ export default function HomePage () {
             {/* <div>Metas anteriores Button</div> */}
           </div>
           <div className='basis-3/5 grid grid-cols-2 gap-y-4'>
-            {data.goals.map((goal: any) => homePageGoalProgress(goal))}
+            {data.goals.filter((goal: any) => goal.isCompleted !== true).map((goal: any) => homePageGoalProgress(goal))}
           </div>
         </div>
       </div>
