@@ -23,7 +23,7 @@ export default function GoalPage() {
         control,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting }
+        formState: { errors, isSubmitting, isLoading }
     } = useForm<FormFields>({
         mode: "onSubmit",
         defaultValues: params.id ? async () => getGoal() : {}
@@ -80,8 +80,8 @@ export default function GoalPage() {
     return (
         <div className='flex w-full'>
             <div className="w-full mx-10">
-                <span className='text-3xl'>Criar nova meta</span>
-                <form onSubmit={handleSubmit(onSubmit)} className="px-8 pt-6 pb-8 mb-4">
+                <span className='text-3xl'>Criar nova meta {isLoading ? '- Carregando....' : ''}</span>                
+                <form onSubmit={handleSubmit(onSubmit)} className={`px-8 pt-6 pb-8 mb-4 ${isLoading ? 'hidden' : ''}`}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
                             Título da meta
