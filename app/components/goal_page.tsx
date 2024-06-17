@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 type Task = {
     title: string;
     description: string;
-    status: string;
+    status: boolean;
 }
 
 type FormFields = {
@@ -30,6 +30,12 @@ export default function GoalPage() {
     });
     const { fields: tasks, append, remove } = useFieldArray({
         name: "tasks",
+        rules: {
+            required: {
+                value: true,
+                message: "You need at least 1 task"
+            }
+        },
         control
     });
 
@@ -43,7 +49,7 @@ export default function GoalPage() {
                 tasks: res.tasks && Array.isArray(res.tasks) ? res.tasks.map((task: any): Task => ({
                     title: task.title,
                     description: task.description,
-                    status: task.status
+                    status: task.status === 'done' ? true : false
                 })) : [],
             };
             return goal;
@@ -55,25 +61,25 @@ export default function GoalPage() {
 
     const onSubmit: SubmitHandler<FormFields> = async (data) => {
         try {
+            const requestBody = JSON.stringify({
+                'title': data.title,
+                'description': data.description,
+                'dueDate': new Date(data.dueDate).toISOString(),
+                'tasks': data.tasks.map((task) => ({
+                    title: task.title,
+                    description: task.description,
+                    status: task.status ? 'done' : 'todo'
+                }))
+            });
             if (params.id) {
                 await fetch(`/api/goal/${params.id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({
-                        'title': data.title,
-                        'description': data.description,
-                        'dueDate': new Date(data.dueDate).toISOString(),
-                        'tasks': data.tasks
-                    })
+                    body: requestBody
                 });
             } else {
                 await fetch('/api/goal', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        'title': data.title,
-                        'description': data.description,
-                        'dueDate': new Date(data.dueDate).toISOString(),
-                        'tasks': data.tasks
-                    })
+                    body: requestBody
                 });
             }
             router.push('/');
@@ -141,9 +147,10 @@ export default function GoalPage() {
                             <span className='font-bold text-xl'>Tarefas</span>
                             <button className='rounded bg-blue-500 text-white py-2 px-3 hover:bg-blue-600' onClick={(e) => {
                                 e.preventDefault();
-                                append({ title: '', description: '', status: 'todo' });
+                                append({ title: '', description: '', status: false });
                             }}>Nova tarefa</button>
                         </div>
+                        {errors.tasks?.root && <span>{errors.tasks.root.message}</span>}
                         {
                             tasks.map((field, index) => (
                                 <div className='mb-6' key={field.id}>
@@ -171,6 +178,13 @@ export default function GoalPage() {
                                         <input
                                             {...register(`tasks.${index}.description`)}
                                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Descrição"
+                                        />
+                                    </div>
+                                    <div className='mt-4'>
+                                        <span>Tarefa completa</span>
+                                        <input
+                                            {...register(`tasks.${index}.status`)}
+                                            className="ml-4" type="checkbox"
                                         />
                                     </div>
                                 </div>

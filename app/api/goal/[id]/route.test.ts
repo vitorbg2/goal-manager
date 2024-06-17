@@ -1,5 +1,5 @@
 import GoalRequestContract from '@/app/api/dto/goal_request_contract'
-import { PATCH } from './route';
+import { PUT } from './route';
 import * as GoalService from '@/lib/services/goal_service';
 
 jest.mock('@/lib/services/goal_service', () => ({
@@ -35,7 +35,7 @@ it('should return updated data with status 200', async () => {
     });
 
     // Act
-    const response = await PATCH(requestObj, params);
+    const response = await PUT(requestObj, params);
     const body = await response.json();
 
     // Assert
@@ -74,7 +74,7 @@ it('should return 500 when occur an unexpected error', async () => {
     jest.spyOn(GoalService, 'UpdateGoal').mockRejectedValue(new Error('Error fatal'));
 
     // Act
-    const response = await PATCH(requestObj, params);
+    const response = await PUT(requestObj, params);
     const body = await response.json();
 
     // Assert

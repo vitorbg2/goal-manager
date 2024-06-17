@@ -9,6 +9,7 @@ export default function HomePage() {
   const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
+    // setup function
     const abortController = new AbortController();
     fetch('/api/goal', {signal: abortController.signal})
       .then(res => res.json())
@@ -19,7 +20,7 @@ export default function HomePage() {
         if (error.name === 'AbortError') console.error("Abort request");
       });
 
-    return () => {
+    return () => { // the cleanup function will cancel fetch request. That's let cleanup function stop anything setup function is doing
       abortController.abort();
     };
   }, [])
